@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model manufacturer {
+  id              Int       @id @default(autoincrement())
+  firmName        String    @map("firm_name") @db.VarChar(255)
+  origin          String    @db.VarChar(100)
+  description     String?
+  location        String?   @db.VarChar(255)
+  website         String?   @db.VarChar(255)
+  supportEmail    String    @map("support_email") @db.VarChar(50)
+  employeeCount   Int?      @map("employee_count")
+  foundedSince    DateTime? @map("founded_since") @db.Date
+  isOperational   Boolean?  @map("is_operational")
+  productCategory String?   @map("product_category") @db.VarChar(100)
+}

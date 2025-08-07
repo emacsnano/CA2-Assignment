@@ -1,0 +1,31 @@
+{
+  "name": "owen_code",
+  "version": "1.0.0",
+  "description": "1. Clone this repository",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.3",
+    "prisma-case-format": "^2.2.1"
+  },
+  "devDependencies": {
+    "prisma": "^6.13.0"
+  },
+  "prisma": {
+    "schema": "./prisma/schema.prisma"
+  }
+}

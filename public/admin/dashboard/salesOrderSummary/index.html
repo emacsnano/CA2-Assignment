@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Management</title>
+    <link href="/main.css" rel="stylesheet" />
+    <link href="/index.css" rel="stylesheet" />
+    <script src="./index.js" type="text/javascript" defer></script>
+    <script src="../../authAdmin.js" defer></script>
+    <script src="../../headerAdmin.js" defer></script>
+</head>
+
+<body>
+    <div id="admin-header-container"></div>
+    <main>
+        <section aria-labelledby="sales-order-summary-title">
+            <h1>Sales Order Summary</h1>
+                <div class="tables-row">
+                    <div class="table-container">
+                        <h2>Spending By Age and Gender</h2>
+                            <table border="1" id="ageGenderTable">
+                                <thead>
+                                    <tr>
+                                        <th>Gender</th>
+                                        <th>Age Group</th>
+                                        <th>Member Count</th>
+                                        <th>Total Spent</th>
+                                        <th>Avg Spent Per Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                    </div>
+
+                    <div class="table-container">
+                        <h2>Latest Spending Per Member</h2>
+                            <table border="1" id="latestSpendingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Member ID</th>
+                                        <th>Username</th>
+                                        <th>Latest Order Date</th>
+                                        <th>Latest Order Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                    </div>
+                </div>
+
+                <div class="tables-row">
+                    <div class="table-container">
+                        <h2>Order by Spending</h2>
+                            <table border="1" id="topSpendersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Member ID</th>
+                                        <th>Username</th>
+                                        <th>Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                    </div>
+
+                    <div class="table-container">
+                        <h2>Min/Max Spending Per Member</h2>
+                            <table border="1" id="minMaxSpendingTable">
+                                <thead>
+                                    <tr>
+                                        <th>Member ID</th>
+                                        <th>Username</th>
+                                        <th>Min Order Spent</th>
+                                        <th>Max Order Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                    </div>
+                </div>
+        </section>
+        <section id="filterSection">
+  <h2>Filter Spending By Age and Gender</h2>
+
+  <form id="filterForm">
+    <label for="genderSelect">Gender:</label>
+    <select id="genderSelect" name="gender">
+      <option value="">All</option>
+      <option value="F">Female</option>
+      <option value="M">Male</option>
+    </select>
+
+    <label for="ageGroupSelect">Age Group:</label>
+    <select id="ageGroupSelect" name="age_group">
+      <option value="">All</option>
+      <option value="Under 20">Under 20</option>
+      <option value="20-29">20-29</option>
+      <option value="30-39">30-39</option>
+      <option value="40+">40+</option>
+    </select>
+
+    <label>
+        Completed Orders:<input type="checkbox" id="statusCompleted" />
+    </label>
+
+    <button type="submit">Filter</button>
+  </form>
+
+  <table border="1" id="filteredTable" style="margin-top:20px; width: 50%;">
+    <thead>
+      <tr>
+        <th>Gender</th>
+        <th>Age Group</th>
+        <th>Member Count</th>
+        <th>Total Spent</th>
+        <th>Avg Spent Per Order</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+    </main>
+</body>
+
+</html>
+
