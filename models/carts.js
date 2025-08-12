@@ -77,17 +77,62 @@ module.exports = {
 
   async getCartWithItems(memberId) {
         return await prisma.cart.findUnique({
-            where: { member_id: memberId },
-            include: {
-                items: {
-                    include: {
-                        product: true  // Include full product details
-                    },
-                    orderBy: {
-                        cart_item_id: 'asc'  // Optional: order items
+            where: { 
+            member_id: memberId 
+        },
+        include: {
+            items: {
+                include: {
+                    product: {
+                        select: {
+                            id: true,
+                            name: true,
+                            description: true,
+                            unit_price: true,
+                            country: true
+                        }
                     }
+                },
+                orderBy: {
+                    cart_item_id: 'asc'
                 }
             }
+        }
         });
+  },
+
+  async calculateCartSummary(memberId) {
+    try {
+        const cart = await this.getCartWithItems(memberId);
+        
+        if (!cart?.items?.length) {
+            return { totalQuantity: 0, totalPrice: 0 };
+        }
+
+        const summary = cart.items.reduce((acc, item) => {
+            // Access unit_price directly (Prisma will convert to camelCase)
+            const unitPrice = Number(item.product?.unit_price) || 0;
+            const quantity = Number(item.quantity) || 0;
+            
+            console.log(`Product ${item.product?.id}:`, {
+                name: item.product?.name,
+                unitPrice: unitPrice,
+                quantity: quantity
+            });
+
+            return {
+                totalQuantity: acc.totalQuantity + quantity,
+                totalPrice: acc.totalPrice + (unitPrice * quantity)
+            };
+        }, { totalQuantity: 0, totalPrice: 0 });
+
+        return {
+            totalQuantity: summary.totalQuantity,
+            totalPrice: parseFloat(summary.totalPrice.toFixed(2))
+        };
+    } catch (error) {
+        console.error('Cart summary error:', error);
+        throw error;
     }
-}
+  }
+} 

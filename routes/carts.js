@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(jwtMiddleware.verifyToken);
 
 router.post('/add', cartController.createCartItems);
-router.get('/retrieve/all', cartController.retrieveCartItems)
+router.get('/all', cartController.retrieveCartItems);
+router.get('/summary', cartController.getCartSummary);
 
 module.exports = router;

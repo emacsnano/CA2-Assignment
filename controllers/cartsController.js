@@ -41,18 +41,33 @@ module.exports.updateCartItems = function (req, res) {
 module.exports.retrieveCartItems = async function (req, res) {
     try {
         const userId = req.user.memberId;
-        
-        // Get cart with items and product details
-        const cart = await cartsModel.getCartWithItems(userId);
+        const cart = await cartsModel.getCartWithItems(userId);         // Get cart with items and product details
         
         if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
+            return res.status(404).json({ 
+                error: 'Cart not found',
+                cartItems: []
+            });
         }
 
-        res.status(200).json({data: cart.items || []});
+        res.status(200).json({
+            cartItems: cart.items.map(item => ({
+                productId: item.product_id,
+                quantity: item.quantity,
+                product: {
+                    id: item.product.id,
+                    description: item.product.description,
+                    country: item.product.country,
+                    unitPrice: item.product.unit_price
+                }
+            }))
+        });
     } catch (error) {
         console.error('Error retrieving cart items:', error);
-        res.status(500).json({ message: 'Failed to retrieve cart items'});
+        res.status(500).json({ 
+            error: 'Failed to retrieve cart items',
+            cartItems: []
+        });
     }
 }
 
@@ -60,6 +75,22 @@ module.exports.deleteCartItems = function (req, res) {
 
 }
 
-module.exports.getCartSummary = function (req, res) {
-
+module.exports.getCartSummary = async function (req, res) {
+    try {
+        const userId = req.user.memberId;
+        const summary = await cartsModel.calculateCartSummary(userId);
+        
+        res.status(200).json({ 
+            cartSummary: summary 
+        });
+    } catch (error) {
+        console.error('Controller error retrieving cart summary:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve cart summary',
+            cartSummary: { 
+                totalQuantity: 0, 
+                totalPrice: 0 
+            }
+        });
+    }
 }
