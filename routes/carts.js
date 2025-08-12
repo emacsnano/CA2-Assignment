@@ -6,7 +6,9 @@ const router = express.Router();
 
 // All routes in this file will use the jwtMiddleware to verify the token
 // Here the jwtMiddleware is applied at the router level to apply to all routes in this file eg. router.use(...)
-
 router.use(jwtMiddleware.verifyToken);
+
+router.post('/add', cartController.createCartItems);
+router.get('/retrieve/all', cartController.retrieveCartItems)
 
 module.exports = router;

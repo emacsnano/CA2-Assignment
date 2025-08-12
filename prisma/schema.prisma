@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -8,16 +7,118 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model manufacturer {
-  id              Int       @id @default(autoincrement())
-  firmName        String    @map("firm_name") @db.VarChar(255)
-  origin          String    @db.VarChar(100)
+model member {
+  id          Int          @id @default(autoincrement())
+  username    String       @unique @db.VarChar(50)
+  email       String       @unique @db.VarChar(50)
+  dob         DateTime     @db.Date
+  password    String       @db.VarChar(255)
+  role        Int
+  gender      String       @db.Char(1)
+  comment     comment[]
+  member_role member_role  @relation(fields: [role], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_member_role_id")
+  review      review[]
+  sale_order  sale_order[]
+  cart        cart[]
+}
+
+model member_role {
+  id     Int      @id @default(autoincrement())
+  name   String?  @db.VarChar(25)
+  member member[]
+}
+
+model product {
+  id              Int               @id @default(autoincrement())
+  name            String?           @db.VarChar(255)
   description     String?
-  location        String?   @db.VarChar(255)
-  website         String?   @db.VarChar(255)
-  supportEmail    String    @map("support_email") @db.VarChar(50)
-  employeeCount   Int?      @map("employee_count")
-  foundedSince    DateTime? @map("founded_since") @db.Date
-  isOperational   Boolean?  @map("is_operational")
-  productCategory String?   @map("product_category") @db.VarChar(100)
+  unit_price      Decimal           @db.Decimal
+  stock_quantity  Decimal           @default(0) @db.Decimal
+  country         String?           @db.VarChar(100)
+  product_type    String?           @db.VarChar(50)
+  image_url       String?           @default("/images/product.png") @db.VarChar(255)
+  manufactured_on DateTime?         @db.Timestamp(6)
+  review          review[]
+  sale_order_item sale_order_item[]
+  cart_item       cart_item[]
+}
+
+model sale_order {
+  id              Int               @id @default(autoincrement())
+  member_id       Int?
+  order_datetime  DateTime          @db.Timestamp(6)
+  status          String?           @db.VarChar(10)
+  member          member?           @relation(fields: [member_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_sale_order_member")
+  sale_order_item sale_order_item[]
+}
+
+model sale_order_item {
+  id            Int        @id @default(autoincrement())
+  sale_order_id Int
+  product_id    Int
+  quantity      Decimal    @db.Decimal
+  product       product    @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_sale_order_item_product")
+  sale_order    sale_order @relation(fields: [sale_order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_sale_order_item_sale_order")
+}
+
+model comment {
+  id           Int       @id @default(autoincrement())
+  review_id    Int
+  member_id    Int
+  comment_text String
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  member       member    @relation(fields: [member_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  review       review    @relation(fields: [review_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model review {
+  id          Int       @id @default(autoincrement())
+  member_id   Int
+  product_id  Int
+  review_text String
+  rating      Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  comment     comment[]
+  member      member    @relation(fields: [member_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product     product   @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model discount_rule_products {
+  id              Int   @id @default(autoincrement())
+  discount_rule_id Int
+  product_id      Int
+}
+
+model discount_rules {
+  id                  Int       @id @default(autoincrement())
+  name                String    @db.VarChar(100)
+  type                String    @db.VarChar(20) // 'product', 'cart', 'tiered'
+  product_id          Int?      // For product-specific discounts
+  min_quantity        Int?      // For product quantity-based discounts
+  min_cart_value      Decimal?  @db.Decimal // For cart value-based discounts
+  discount_percentage Decimal   @db.Decimal
+  is_active           Boolean   @default(true)
+  created_at          DateTime  @default(now())
+}
+
+model cart {
+  cart_id    Int        @id @default(autoincrement())
+  member_id  Int        @unique
+  items      cart_item[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  member     member     @relation(fields: [member_id], references: [id])
+}
+
+model cart_item {
+  cart_item_id Int     @id @default(autoincrement())
+  cart_id      Int
+  product_id   Int
+  quantity     Int
+  cart         cart     @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade)
+  product      product @relation(fields: [product_id], references: [id])
+  
+  @@unique([cart_id, product_id])
 }
