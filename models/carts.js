@@ -134,5 +134,79 @@ module.exports = {
         console.error('Cart summary error:', error);
         throw error;
     }
+  },
+
+  async updateCartItem(memberId, productId, quantity) {
+    try {
+        // Get the cart first
+        const cart = await this.getOrCreateCart(memberId);
+        
+        // Transaction for atomic operations
+        return await prisma.$transaction([
+            prisma.cart_item.update({
+                where: {
+                    cart_id_product_id: {
+                        cart_id: cart.cart_id,
+                        product_id: productId
+                    }
+                },
+                data: {
+                    quantity: quantity
+                },
+                include: {
+                    product: true
+                }
+            }),
+            // Update product stock if needed
+            // (Add your stock management logic here if needed)
+        ]);
+    } catch (error) {
+        console.error('Error in updateCartItem:', error);
+        throw error;
+    }
+},
+
+  async deleteCartItem(memberId, productId) {
+    try {
+        const cart = await this.getOrCreateCart(memberId);
+        
+        // First get the item to get the quantity
+        const item = await prisma.cart_item.findUnique({
+            where: {
+                cart_id_product_id: {
+                    cart_id: cart.cart_id,
+                    product_id: productId
+                }
+            }
+        });
+
+        if (!item) throw new Error('Item not found in cart');
+
+        await prisma.$transaction([
+            // Delete the cart item
+            prisma.cart_item.delete({
+                where: {
+                    cart_id_product_id: {
+                        cart_id: cart.cart_id,
+                        product_id: productId
+                    }
+                }
+            }),
+            // Return stock to inventory - using item.quantity instead of undefined quantity
+            prisma.product.update({
+                where: { id: productId },
+                data: {
+                    stock_quantity: {
+                        increment: item.quantity // Use the quantity from the found item
+                    }
+                }
+            })
+        ]);
+
+        return true;
+    } catch (error) {
+        console.error('Delete cart item error:', error);
+        throw error;
+    }
   }
-} 
+}

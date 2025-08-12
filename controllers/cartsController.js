@@ -32,9 +32,28 @@ module.exports.createCartItems = async function (req, res) {
     }
 }
 
-// Update items in the cart
-module.exports.updateCartItems = function (req, res) {
+// Update item in the cart
+module.exports.updateCartItems = async function (req, res) {
+    try {
+        const { productId, quantity } = req.body;
+        const memberId = req.user.memberId;
 
+        if (!productId || !quantity) {
+            return res.status(400).json({ error: 'Missing productId or quantity' });
+        }
+
+        const updatedItem = await cartsModel.updateCartItem(memberId, productId, quantity);
+        
+        res.status(200).json({
+            message: 'Cart item updated successfully',
+            cartItem: updatedItem
+        });
+    } catch (error) {
+        console.error('Error updating cart item:', error);
+        res.status(500).json({ 
+            error: error.message || 'Failed to update cart item'
+        });
+    }
 }
 
 // Get all items in the cart
@@ -71,10 +90,30 @@ module.exports.retrieveCartItems = async function (req, res) {
     }
 }
 
-module.exports.deleteCartItems = function (req, res) {
+// Delete item in the cart
+module.exports.deleteCartItems = async function (req, res) {
+    try {
+        const { productId } = req.body;
+        const memberId = req.user.memberId;
 
+        if (!productId) {
+            return res.status(400).json({ error: 'Missing productId' });
+        }
+
+        await cartsModel.deleteCartItem(memberId, productId);
+        
+        res.status(200).json({
+            message: 'Cart item deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting cart item:', error);
+        res.status(500).json({ 
+            error: error.message || 'Failed to delete cart item'
+        });
+    }
 }
 
+// Get summary of the cart
 module.exports.getCartSummary = async function (req, res) {
     try {
         const userId = req.user.memberId;

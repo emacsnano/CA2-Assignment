@@ -11,5 +11,7 @@ router.use(jwtMiddleware.verifyToken);
 router.post('/add', cartController.createCartItems);
 router.get('/all', cartController.retrieveCartItems);
 router.get('/summary', cartController.getCartSummary);
+router.put('/', cartController.updateCartItems);
+router.delete('/', cartController.deleteCartItems);
 
 module.exports = router;

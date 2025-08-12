@@ -204,17 +204,21 @@ function updateCartItem(token, productId, quantityInput) {
         })
     })
     .then(response => {
-        if (!response.ok) throw new Error("Update failed");
-        location.reload(); // Refresh to show updated cart
+        if (!response.ok) return response.json().then(err => { throw new Error(err.error) });
+        return response.json();
+    })
+    .then(data => {
+        alert('Quantity updated successfully');
+        location.reload();
     })
     .catch(error => {
         console.error("Update error:", error);
-        alert("Failed to update quantity");
+        alert(error.message || "Failed to update quantity");
     });
 }
 
 function deleteCartItem(token, productId) {
-    if (!confirm("Are you sure you want to remove this item from your cart?")) return;
+    if (!confirm("Are you sure you want to remove this item?")) return;
 
     fetch('/carts', {
         method: 'DELETE',
@@ -222,16 +226,18 @@ function deleteCartItem(token, productId) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-            productId: productId
-        })
+        body: JSON.stringify({ productId })
     })
     .then(response => {
-        if (!response.ok) throw new Error("Delete failed");
-        location.reload(); // Refresh to show updated cart
+        if (!response.ok) return response.json().then(err => { throw new Error(err.error) });
+        return response.json();
+    })
+    .then(data => {
+        alert('Item removed successfully');
+        location.reload();
     })
     .catch(error => {
         console.error("Delete error:", error);
-        alert("Failed to remove item");
+        alert(error.message || "Failed to remove item");
     });
 }
