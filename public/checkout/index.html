@@ -1,20 +1,59 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
     <link href="/main.css" rel="stylesheet" />
-    <link href="/index.css" rel="stylesheet" />
-    <script src="../auth.js" defer></script>
-    <script src="../header.js" defer></script>
+    <link href="/index.css" rel="stylesheet">
+    <!-- Scripts -->
+    <script src="/auth.js" defer></script>
+    <script src="/header.js" defer></script>
 </head>
-
 <body>
     <div id="header-container"></div>
-    <section style="height: auto">
-        <div>
-            <h1>This is the main page for you to implement checkout</h1>
-        </div>
-    </section>
-</body>
+    <main class="checkout-container">
+        <h1>Your Shopping Cart</h1>
+        
+        <!-- Cart Items Section -->
+        <section id="cart-container">
+            <div id="cart-items" class="cart-items">
+                <!-- Loading state will be replaced by renderCart() -->
+                <div class="loading-spinner"></div>
+            </div>
+            
+            <!-- Discounts Section - Modified to match renderCart -->
+            <div id="discounts" class="discounts-container">
+                <!-- Content will be populated by renderCart() -->
+            </div>
+            
+            <!-- Totals Section - Updated classes -->
+            <div class="totals">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>Discount:</span>
+                    <span id="discount-total">$0.00</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total:</span>
+                    <span id="total">$0.00</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Checkout Button -->
+        <button id="checkout-button" class="checkout-btn" disabled>
+            Proceed to Checkout
+        </button>
+        
+        <!-- Error Container -->
+        <div id="error-container" class="error-message"></div>
+    </main>
 
+    <!-- Main Script -->
+    <script src="./index.js" type="module" defer></script>
+</body>
 </html>

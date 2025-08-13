@@ -38,9 +38,11 @@ model product {
   product_type    String?           @db.VarChar(50)
   image_url       String?           @default("/images/product.png") @db.VarChar(255)
   manufactured_on DateTime?         @db.Timestamp(6)
+  
   review          review[]
   sale_order_item sale_order_item[]
   cart_item       cart_item[]
+  discount_rules discount_rule_products[]
 }
 
 model sale_order {
@@ -87,8 +89,12 @@ model review {
 
 model discount_rule_products {
   id              Int   @id @default(autoincrement())
+  discount_rule   discount_rules @relation(fields: [discount_rule_id], references: [id])
+  product         product        @relation(fields: [product_id], references: [id])
   discount_rule_id Int
   product_id      Int
+
+  @@unique([discount_rule_id, product_id])
 }
 
 model discount_rules {
@@ -101,6 +107,9 @@ model discount_rules {
   discount_percentage Decimal   @db.Decimal
   is_active           Boolean   @default(true)
   created_at          DateTime  @default(now())
+
+  products            discount_rule_products[]
+  cart                cart[]
 }
 
 model cart {
@@ -110,6 +119,8 @@ model cart {
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
   member     member     @relation(fields: [member_id], references: [id])
+  discount_rule_id Int?
+  discount_rule   discount_rules? @relation(fields: [discount_rule_id], references: [id])
 }
 
 model cart_item {

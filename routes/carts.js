@@ -14,4 +14,11 @@ router.get('/summary', cartController.getCartSummary);
 router.put('/', cartController.updateCartItems);
 router.delete('/', cartController.deleteCartItems);
 
+router.get('/cart', cartController.getCart);
+router.post('/discounts/apply', cartController.applyDiscount);
+router.delete('/discounts/remove', cartController.removeDiscount);
+
+// Checkout
+router.post('/checkout', cartController.processCheckout);
+
 module.exports = router;

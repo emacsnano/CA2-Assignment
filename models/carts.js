@@ -208,5 +208,28 @@ module.exports = {
         console.error('Delete cart item error:', error);
         throw error;
     }
+  },
+
+
+
+  async getCartWithItems(memberId) {
+    return await prisma.cart.findUnique({
+      where: { member_id: memberId },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                discount_rules: {
+                  include: {
+                    discount_rule: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
   }
 }
