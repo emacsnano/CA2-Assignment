@@ -110,7 +110,7 @@ module.exports = {
         }
 
         const summary = cart.items.reduce((acc, item) => {
-            // Access unit_price directly (Prisma will convert to camelCase)
+            // Access unit_price directly
             const unitPrice = Number(item.product?.unit_price) || 0;
             const quantity = Number(item.quantity) || 0;
             
@@ -158,7 +158,6 @@ module.exports = {
                 }
             }),
             // Update product stock if needed
-            // (Add your stock management logic here if needed)
         ]);
     } catch (error) {
         console.error('Error in updateCartItem:', error);

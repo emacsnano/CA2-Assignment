@@ -4,6 +4,10 @@ const cartsModel = require('../models/carts');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+////////////////////////////////////////////////////////////
+// Cart CRUD Functionality
+////////////////////////////////////////////////////////////
+
 // Add items to the cart
 module.exports.createCartItems = async function (req, res) {
     try {
@@ -15,7 +19,7 @@ module.exports.createCartItems = async function (req, res) {
         const productIdNum = Number(productId);
         const quantityNum = Number(quantity);
 
-        // Input validation
+        // Input Validation if quantity is < 0, or if no Id or quantity
         if (!productIdNum || !quantityNum || quantityNum <= 0) {
             return res.status(400).json({ 
                 message: 'Product ID and positive quantity are required' 
@@ -26,7 +30,6 @@ module.exports.createCartItems = async function (req, res) {
         
         res.status(201).json(item);
     } catch (err) {
-        // Error handling
         if (err.message.includes('Product not found') || err.message.includes('Insufficient stock')) {
             return res.status(400).json({ message: err.message });
         }
@@ -62,7 +65,7 @@ module.exports.updateCartItems = async function (req, res) {
 module.exports.retrieveCartItems = async function (req, res) {
     try {
         const userId = req.user.memberId;
-        const cart = await cartsModel.getCartWithItems(userId);         // Get cart with items and product details
+        const cart = await cartsModel.getCartWithItems(userId);
         
         if (!cart) {
             return res.status(404).json({ 
@@ -249,7 +252,6 @@ async function getAvailableDiscounts(memberId, subtotal = 0) {
     });
 }
 
-// Controller methods
 module.exports.getCart =  async function(req, res) {
         try {
             if (!req.user?.memberId) {
