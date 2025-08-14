@@ -440,40 +440,40 @@ module.exports.removeDiscount =  async function(req, res) {
         }
     }
 
-
+////////////////////////////////////////////////////////////
+// Process checkout using stored procedure
+////////////////////////////////////////////////////////////
 
 // Process checkout
 module.exports.processCheckout = async function(req, res) {
-        try {
-            if (!req.user?.memberId) {
-                return res.status(401).json({ error: "Unauthorized" });
-            }
-
-            // Get the current cart with discounts applied
-            const cart = await this.getCartWithDiscounts(req.user.memberId);
-            
-            // Create order logic would go here
-            // const order = await createOrder(req.user.memberId, cart);
-            
-            // For now, we'll just return a mock response
-            res.json({ 
-                success: true, 
-                message: 'Checkout completed successfully',
-                order: {
-                    id: `order_${Date.now()}`,
-                    total: cart.total,
-                    items: cart.items
-                }
-            });
-        } catch (error) {
-            console.error('Checkout error:', error);
-            res.status(500).json({ 
-                error: "Checkout failed",
-                details: error.message
-            });
+    try {
+        if (!req.user?.memberId) {
+            return res.status(401).json({ error: "Unauthorized" });
         }
+
+        // Execute stored procedure
+        const result = await prisma.$queryRaw`
+            CALL place_order(${req.user.memberId}, null, null)
+        `;
+        
+        // Convert BigInt to string for JSON serialization
+        const response = {
+            success: !!result[0].p_order_id,
+            orderId: result[0].p_order_id?.toString(), // Convert to string
+            message: result[0].p_message
+        };
+        
+        res.json(response);
+    } catch (error) {
+        console.error('Checkout error:', error);
+        res.status(500).json({ 
+            error: "Checkout failed",
+            details: error.message
+        });
+    }
 }
 
+// Admin function for setting discount (Not Working)
 // module.exports.getCartWithDiscounts = async function(memberId) {
 //     try {
 //             const cart = await prisma.cart.findUnique({

@@ -135,29 +135,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Handle checkout
-    checkoutBtn.addEventListener('click', async () => {
-        try {
-            checkoutBtn.disabled = true;
-            const response = await fetch('/carts/checkout', {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Checkout failed');
+    async function handleCheckout() {
+    try {
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'Processing...';
+        
+        const response = await fetch('/carts/checkout', {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
+        });
 
-            window.location.href = '/orders';
-        } catch (error) {
-            showError(error.message);
-        } finally {
-            checkoutBtn.disabled = false;
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Checkout failed');
         }
-    });
+
+        if (result.success) {
+            // Show success message
+            const messageEl = document.createElement('div');
+            messageEl.className = 'success-message';
+            messageEl.innerHTML = `
+                <p>${result.message}</p>
+                <p>Order ID: ${result.orderId}</p>
+            `;
+            cartContainer.appendChild(messageEl);
+            
+            // Reload cart to show remaining items
+            await loadCart();
+        } else {
+            // Show warning about insufficient stock
+            showError(result.message);
+        }
+    } catch (error) {
+        showError(error.message);
+    }
+    }
+
+    // Update event listener 
+    checkoutBtn.addEventListener('click', handleCheckout);
 
     // Initial load
     loadCart();
